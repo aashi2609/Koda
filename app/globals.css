@@ -1,26 +1,77 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #030303;
+  --foreground: #ededed;
+  --neon-cyan: #00FFFF;
+  --neon-pink: #FF00FF;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-cyber-bg: #030303;
+  --color-neon-cyan: #00FFFF;
+  --color-neon-pink: #FF00FF;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
+  background: #030303;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Custom animations for cyber-noir theme */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* Neon glow effects */
+.neon-glow-cyan {
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5),
+              0 0 20px rgba(0, 255, 255, 0.3),
+              0 0 30px rgba(0, 255, 255, 0.1);
+}
+
+.neon-glow-pink {
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.5),
+              0 0 20px rgba(255, 0, 255, 0.3),
+              0 0 30px rgba(255, 0, 255, 0.1);
+}
+
+/* Neon pulse on hover for buttons */
+@keyframes neon-pulse-cyan {
+  0%, 100% { box-shadow: 0 0 5px rgba(0,255,255,0.4), 0 0 10px rgba(0,255,255,0.2); }
+  50%       { box-shadow: 0 0 15px rgba(0,255,255,0.8), 0 0 30px rgba(0,255,255,0.4); }
+}
+@keyframes neon-pulse-pink {
+  0%, 100% { box-shadow: 0 0 5px rgba(255,0,255,0.4), 0 0 10px rgba(255,0,255,0.2); }
+  50%       { box-shadow: 0 0 15px rgba(255,0,255,0.8), 0 0 30px rgba(255,0,255,0.4); }
+}
+
+.btn-neon-cyan:hover  { animation: neon-pulse-cyan 1.5s ease-in-out infinite; }
+.btn-neon-pink:hover  { animation: neon-pulse-pink 1.5s ease-in-out infinite; }
+
+/* Smooth page transitions */
+.page-enter { opacity: 0; transform: translateY(12px); }
+.page-enter-active { opacity: 1; transform: translateY(0); transition: opacity 0.4s ease, transform 0.4s ease; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #020202; }
+::-webkit-scrollbar-thumb { background: rgba(0,255,255,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,255,255,0.6); }
+
+/* Touch targets — min 44px for mobile */
+button, a { min-height: 44px; }
