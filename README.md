@@ -1,7 +1,7 @@
 # 💎 KODA | Peer-to-Peer Skill Exchange
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/username/repo/main/public/logo.png" alt="Koda Logo" width="200"/>
+  <h1>KODA</h1>
   <h3>Mastery through Exchange</h3>
   <p><i>A premium, automated ecosystem for community-driven skill swapping.</i></p>
   
