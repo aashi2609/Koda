@@ -1,13 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import { FiSearch, FiX } from "react-icons/fi";
 import Navigation from "../components/Navigation";
 import UserCard from "../components/UserCard";
+import { UserCardSkeleton } from "../components/Skeleton";
 import SwapRequestModal from "../components/SwapRequestModal";
+import dynamic from "next/dynamic";
+
+const Aurora = dynamic(() => import("../components/Aurora"), { ssr: false });
 
 interface User {
   id: string;
@@ -17,6 +21,9 @@ interface User {
   bio?: string;
   skillsOffered: string[];
   skillsDesired: string[];
+  averageRating?: number;
+  reviewCount?: number;
+  hasActiveRequest?: boolean;
 }
 
 export default function DiscoverPage() {
@@ -58,36 +65,36 @@ export default function DiscoverPage() {
     checkProfile();
   }, [status, router]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      if (status !== "authenticated") return;
+  const fetchUsers = useCallback(async () => {
+    if (status !== "authenticated") return;
 
-      try {
-        setLoading(true);
-        setError("");
-        
-        const url = skillFilter
-          ? `/api/users?skill=${encodeURIComponent(skillFilter)}`
-          : "/api/users";
-        
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch users");
-        }
+    try {
+      setLoading(true);
+      setError("");
 
-        const data = await response.json();
-        setUsers(data.users || []);
-      } catch (err) {
-        console.error("Error fetching users:", err);
-        setError("Failed to load users. Please try again.");
-      } finally {
-        setLoading(false);
+      const url = skillFilter
+        ? `/api/users?skill=${encodeURIComponent(skillFilter)}`
+        : "/api/users";
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
       }
-    };
 
-    fetchUsers();
+      const data = await response.json();
+      setUsers(data.users || []);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      setError("Failed to load users. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }, [status, skillFilter]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleRequestSwap = (userId: string) => {
     const user = users.find((u) => u.id === userId);
@@ -104,6 +111,7 @@ export default function DiscoverPage() {
 
   const handleSwapSuccess = () => {
     setSuccessMessage("Swap request sent successfully!");
+    fetchUsers(); // Refresh list to update button state
     setTimeout(() => setSuccessMessage(""), 5000);
   };
 
@@ -126,6 +134,10 @@ export default function DiscoverPage() {
     <>
       <Navigation />
       <div className="relative min-h-screen bg-[#030303] pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+        {/* Aurora background */}
+        <div className="fixed inset-0 z-0 opacity-30 pointer-events-none">
+          <Aurora colorStops={["#00FFFF", "#5500FF", "#FF00FF"]} blend={0.4} amplitude={1.0} speed={0.6} />
+        </div>
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <motion.div

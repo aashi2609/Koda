@@ -6,6 +6,10 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Navigation from "../components/Navigation";
 import SwapRequestCard from "../components/SwapRequestCard";
+import dynamic from "next/dynamic";
+import Skeleton, { DashboardStatSkeleton, UserCardSkeleton } from "../components/Skeleton";
+
+const Aurora = dynamic(() => import("../components/Aurora"), { ssr: false });
 
 interface SwapUser {
   _id: string;
@@ -19,7 +23,7 @@ interface SwapRequest {
   senderId: SwapUser;
   receiverId: SwapUser;
   message: string;
-  status: "pending" | "accepted" | "rejected";
+  status: "pending" | "negotiating" | "active" | "completed" | "rejected";
   createdAt: string;
 }
 
@@ -63,7 +67,7 @@ export default function DashboardPage() {
     if (status === "authenticated") fetchRequests();
   }, [status, router, fetchRequests]);
 
-  const handleUpdateStatus = async (id: string, newStatus: "accepted" | "rejected") => {
+  const handleUpdateStatus = async (id: string, newStatus: string) => {
     try {
       const res = await fetch(`/api/swaps/${id}`, {
         method: "PATCH",
@@ -75,7 +79,7 @@ export default function DashboardPage() {
         throw new Error(d.error || "Failed to update");
       }
       showToast(
-        `Request ${newStatus === "accepted" ? "accepted" : "rejected"} successfully`,
+        `Request updated to ${newStatus} successfully`,
         "success"
       );
       fetchRequests();
@@ -86,116 +90,169 @@ export default function DashboardPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-[#030303] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00FFFF]" />
-      </div>
+      <>
+        <Navigation />
+        <div className="min-h-screen bg-[#030303] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
+              <div className="space-y-4">
+                <Skeleton className="w-64 h-12" />
+                <Skeleton className="w-96 h-6" />
+              </div>
+              <div className="flex gap-8">
+                <DashboardStatSkeleton />
+                <DashboardStatSkeleton />
+                <DashboardStatSkeleton />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <UserCardSkeleton key={i} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
+
+  const activeSwaps = [...incoming, ...outgoing].filter(s => ["negotiating", "active"].includes(s.status));
+  const completedSwaps = [...incoming, ...outgoing].filter(s => s.status === "completed");
+  const pendingIncoming = incoming.filter(s => s.status === "pending");
+  const pendingOutgoing = outgoing.filter(s => s.status === "pending");
 
   return (
     <>
       <Navigation />
-      <div className="relative min-h-screen bg-[#030303] pt-20 pb-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <div className="relative min-h-screen bg-[#030303] pt-24 pb-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Aurora background */}
+        <div className="fixed inset-0 z-0 opacity-30 pointer-events-none">
+          <Aurora colorStops={["#00FFFF", "#5500FF", "#FF00FF"]} blend={0.4} amplitude={1.0} speed={0.6} />
+        </div>
+
         {/* Background glows */}
-        <div className="absolute top-40 left-10 w-72 h-72 bg-neon-cyan/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-40 right-10 w-72 h-72 bg-neon-pink/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-40 left-10 w-72 h-72 bg-[#00FFFF]/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-40 right-10 w-72 h-72 bg-[#FF00FF]/5 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10">
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-10"
+            className="mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6"
           >
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-neon-cyan to-neon-pink bg-clip-text text-transparent mb-2">
-              Dashboard
-            </h1>
-            <p className="text-gray-400">Manage your skill swap requests</p>
+            <div>
+              <h1 className="text-5xl font-extrabold bg-gradient-to-r from-[#00FFFF] to-[#FF00FF] bg-clip-text text-transparent mb-3 tracking-tighter">
+                DASHBOARD
+              </h1>
+              <p className="text-white/40 font-medium">Coordinate your peer-to-peer learning sessions.</p>
+            </div>
+
+            {/* Stats Ribbon */}
+            <div className="flex gap-4 sm:gap-8">
+              {[
+                { label: "Total Swaps", count: incoming.length + outgoing.length, color: "white" },
+                { label: "Active Learning", count: activeSwaps.length, color: "#00FFFF" },
+                { label: "Completed", count: completedSwaps.length, color: "#FF00FF" },
+              ].map((stat, i) => (
+                <div key={i} className="text-right">
+                  <div className="text-xs font-bold uppercase tracking-widest text-white/30 mb-1">{stat.label}</div>
+                  <div className="text-3xl font-black text-white" style={{ color: stat.color }}>{stat.count}</div>
+                </div>
+              ))}
+            </div>
           </motion.div>
 
-          {/* Two-column layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Incoming Requests */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-xl font-bold text-neon-cyan">Incoming Requests</h2>
-                <span className="px-2 py-0.5 bg-neon-cyan/10 border border-neon-cyan/40 rounded-full text-neon-cyan text-sm">
-                  {incoming.length}
-                </span>
-              </div>
-              <div className="space-y-4">
-                {incoming.length === 0 ? (
-                  <EmptyState message="No incoming requests yet" color="cyan" />
-                ) : (
-                  incoming.map((req, i) => (
-                    <motion.div
-                      key={req._id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                    >
-                      <SwapRequestCard
-                        request={req}
-                        type="incoming"
-                        onUpdateStatus={handleUpdateStatus}
-                      />
-                    </motion.div>
-                  ))
-                )}
+          {/* Active Sessions Section */}
+          {activeSwaps.length > 0 && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-12">
+              <h2 className="text-xl font-bold text-[#00FFFF] mb-6 flex items-center gap-3">
+                <span className="w-2 h-2 rounded-full bg-[#00FFFF] animate-pulse" />
+                Active Sessions
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {activeSwaps.map((req) => (
+                  <SwapRequestCard
+                    key={req._id}
+                    request={req}
+                    type={incoming.find(i => i._id === req._id) ? "incoming" : "outgoing"}
+                    onUpdateStatus={handleUpdateStatus}
+                  />
+                ))}
               </div>
             </motion.div>
+          )}
 
-            {/* Outgoing Requests */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <h2 className="text-xl font-bold text-neon-pink">Outgoing Requests</h2>
-                <span className="px-2 py-0.5 bg-neon-pink/10 border border-neon-pink/40 rounded-full text-neon-pink text-sm">
-                  {outgoing.length}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Incoming Section */}
+            <div>
+              <h2 className="text-xl font-bold text-white mb-6 flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  Incoming Requests
+                  <span className="text-[10px] uppercase bg-white/5 border border-white/10 px-2 py-0.5 rounded text-white/40 font-bold tracking-wider">RECEIVED</span>
                 </span>
-              </div>
+                <span className="text-xs bg-white/10 px-2 py-1 rounded-md text-white/60">{incoming.length}</span>
+              </h2>
               <div className="space-y-4">
-                {outgoing.length === 0 ? (
-                  <EmptyState message="No outgoing requests yet" color="pink" />
+                {pendingIncoming.length === 0 ? (
+                  <EmptyState message="No pending incoming requests" />
                 ) : (
-                  outgoing.map((req, i) => (
-                    <motion.div
-                      key={req._id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                    >
-                      <SwapRequestCard
-                        request={req}
-                        type="outgoing"
-                        onUpdateStatus={handleUpdateStatus}
-                      />
-                    </motion.div>
+                  pendingIncoming.map((req) => (
+                    <SwapRequestCard key={req._id} request={req} type="incoming" onUpdateStatus={handleUpdateStatus} />
                   ))
                 )}
               </div>
-            </motion.div>
+            </div>
+
+            {/* Outgoing Section */}
+            <div>
+              <h2 className="text-xl font-bold text-white mb-6 flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  Sent Requests
+                  <span className="text-[10px] uppercase bg-white/5 border border-white/10 px-2 py-0.5 rounded text-white/40 font-bold tracking-wider">OUTGOING</span>
+                </span>
+                <span className="text-xs bg-white/10 px-2 py-1 rounded-md text-white/60">{outgoing.length}</span>
+              </h2>
+              <div className="space-y-4">
+                {pendingOutgoing.length === 0 ? (
+                  <EmptyState message="No pending outgoing requests" />
+                ) : (
+                  pendingOutgoing.map((req) => (
+                    <SwapRequestCard key={req._id} request={req} type="outgoing" onUpdateStatus={handleUpdateStatus} />
+                  ))
+                )}
+              </div>
+            </div>
           </div>
+
+          {/* Completed Section (Optional) */}
+          {completedSwaps.length > 0 && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-16">
+              <h2 className="text-xl font-bold text-[#FF00FF] mb-6">Completed Swaps</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-60 grayscale hover:grayscale-0 transition-all">
+                {completedSwaps.map((req) => (
+                  <SwapRequestCard
+                    key={req._id}
+                    request={req}
+                    type={incoming.find(i => i._id === req._id) ? "incoming" : "outgoing"}
+                    onUpdateStatus={handleUpdateStatus}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* Toast Notification */}
         <AnimatePresence>
           {toast && (
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 50 }}
-              className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-lg border backdrop-blur-md text-sm font-medium ${
+              initial={{ opacity: 0, y: 50, x: "-50%" }}
+              animate={{ opacity: 1, y: 0, x: "-50%" }}
+              exit={{ opacity: 0, y: 50, x: "-50%" }}
+              className={`fixed bottom-8 left-1/2 z-50 px-6 py-4 rounded-2xl border backdrop-blur-xl text-sm font-bold tracking-tight shadow-2xl ${
                 toast.type === "success"
-                  ? "bg-neon-cyan/10 border-neon-cyan/50 text-neon-cyan"
-                  : "bg-neon-pink/10 border-neon-pink/50 text-neon-pink"
+                  ? "bg-[#00FFFF]/10 border-[#00FFFF]/50 text-[#00FFFF]"
+                  : "bg-[#FF00FF]/10 border-[#FF00FF]/50 text-[#FF00FF]"
               }`}
             >
               {toast.message}
@@ -207,12 +264,10 @@ export default function DashboardPage() {
   );
 }
 
-function EmptyState({ message, color }: { message: string; color: "cyan" | "pink" }) {
-  const borderColor = color === "cyan" ? "border-neon-cyan/20" : "border-neon-pink/20";
-  const textColor = color === "cyan" ? "text-gray-500" : "text-gray-500";
+function EmptyState({ message }: { message: string }) {
   return (
-    <div className={`backdrop-blur-md bg-white/3 border ${borderColor} rounded-lg p-8 text-center`}>
-      <p className={textColor}>{message}</p>
+    <div className="backdrop-blur-md bg-white/3 border border-white/10 rounded-2xl p-10 text-center">
+      <p className="text-white/20 text-sm font-medium">{message}</p>
     </div>
   );
 }

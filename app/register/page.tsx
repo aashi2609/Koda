@@ -104,7 +104,7 @@ export default function RegisterPage() {
                   <motion.button
                     whileHover={{ scale: 1.02, boxShadow: "0 0 16px rgba(0,255,255,0.3)" }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => signIn("github", { callbackUrl: "/onboarding" })}
+                    onClick={() => signIn("github", { callbackUrl: "/discover" })}
                     className="flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium hover:border-[#00FFFF]/50 transition-all"
                   >
                     <FaGithub /> GitHub
@@ -112,7 +112,7 @@ export default function RegisterPage() {
                   <motion.button
                     whileHover={{ scale: 1.02, boxShadow: "0 0 16px rgba(255,0,255,0.3)" }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => signIn("google", { callbackUrl: "/onboarding" })}
+                    onClick={() => signIn("google", { callbackUrl: "/discover" })}
                     className="flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium hover:border-[#FF00FF]/50 transition-all"
                   >
                     <FaGoogle /> Google

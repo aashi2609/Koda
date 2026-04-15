@@ -150,14 +150,6 @@ export default function LandingPage() {
           </span>
           <div className="flex items-center gap-3">
             <motion.button
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              onClick={() => router.push("/register")}
-              className="hidden sm:flex items-center gap-2 px-4 py-2 border border-white/20 rounded-lg text-sm text-white hover:text-[#00FFFF] hover:border-[#00FFFF] transition-all"
-            >
-              <FaGithub /> GitHub
-            </motion.button>
-            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.96 }}
               onClick={() => router.push("/register")}

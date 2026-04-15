@@ -15,11 +15,23 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
       allowDangerousEmailAccountLinking: true,
+      authorization: {
+        params: {
+          prompt: "consent",
+        },
+      },
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       allowDangerousEmailAccountLinking: true,
+      authorization: {
+        params: {
+          prompt: "select_account",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
     }),
     CredentialsProvider({
       name: "credentials",
@@ -58,15 +70,32 @@ export const authOptions: NextAuthOptions = {
   ],
   session: { strategy: "jwt" },
   callbacks: {
+    async jwt({ token, user, trigger }) {
+      if (user) {
+        token.sub = user.id;
+      }
+      // Check onboarding status on sign in or when triggered
+      if (user || trigger === "update") {
+        await dbConnect();
+        const dbUser = await User.findOne({
+          $or: [
+            { _id: token.sub },
+            { email: token.email },
+          ],
+        });
+        if (dbUser) {
+          token.onboardingComplete = dbUser.onboardingComplete || false;
+          token.sub = dbUser._id.toString();
+        }
+      }
+      return token;
+    },
     async session({ session, token }) {
       if (session.user && token.sub) {
         session.user.id = token.sub;
+        session.user.onboardingComplete = token.onboardingComplete || false;
       }
       return session;
-    },
-    async jwt({ token, user }) {
-      if (user) token.sub = user.id;
-      return token;
     },
     async signIn({ user, account }) {
       // OAuth users are auto-verified

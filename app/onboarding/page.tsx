@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX } from "react-icons/fi";
 import dynamic from "next/dynamic";
@@ -11,6 +12,7 @@ const Aurora = dynamic(() => import("../components/Aurora"), { ssr: false });
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { update: updateSession } = useSession();
   const [bio, setBio] = useState("");
   const [skillsOffered, setSkillsOffered] = useState<string[]>([]);
   const [skillsDesired, setSkillsDesired] = useState<string[]>([]);
@@ -39,9 +41,11 @@ export default function OnboardingPage() {
       const res = await fetch("/api/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bio, skillsOffered, skillsDesired }),
+        body: JSON.stringify({ bio, skillsOffered, skillsDesired, onboardingComplete: true }),
       });
       if (!res.ok) throw new Error((await res.json()).error || "Failed to update profile");
+      // Trigger session update so JWT gets the new onboardingComplete flag
+      await updateSession();
       router.push("/discover");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");

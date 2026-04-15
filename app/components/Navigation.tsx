@@ -10,11 +10,15 @@ export default function Navigation() {
   if (!session) return null;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-[#030303]/80 border-b border-[#00FFFF]/20">
+    <nav className="fixed top-0 left-0 right-0 z-50 glass-dark border-b border-[#00FFFF]/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+      <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#00FFFF]/30 to-transparent" />
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/discover">
-            <motion.span whileHover={{ scale: 1.05 }} className="text-2xl font-bold bg-gradient-to-r from-[#00FFFF] to-[#FF00FF] bg-clip-text text-transparent tracking-widest cursor-pointer">
+            <motion.span 
+              whileHover={{ scale: 1.05 }} 
+              className="text-2xl font-black font-heading bg-gradient-to-r from-[#00FFFF] to-[#FF00FF] bg-clip-text text-transparent tracking-tighter cursor-pointer"
+            >
               KODA
             </motion.span>
           </Link>
@@ -25,7 +29,10 @@ export default function Navigation() {
               { href: "/dashboard", label: "Dashboard" },
             ].map(({ href, label }) => (
               <Link key={href} href={href}>
-                <motion.span whileHover={{ scale: 1.05 }} className="text-gray-300 hover:text-[#00FFFF] transition-colors cursor-pointer text-sm">
+                <motion.span 
+                  whileHover={{ scale: 1.05 }} 
+                  className={`text-gray-300 hover:text-[#00FFFF] transition-colors cursor-pointer text-sm font-medium`}
+                >
                   {label}
                 </motion.span>
               </Link>

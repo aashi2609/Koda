@@ -1,13 +1,56 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
+export interface IMilestone {
+  _id?: mongoose.Types.ObjectId;
+  title: string;
+  completed: boolean;
+}
+
+export interface IResource {
+  _id?: mongoose.Types.ObjectId;
+  label: string;
+  url: string;
+}
+
+export interface IChatMessage {
+  _id?: mongoose.Types.ObjectId;
+  senderId: mongoose.Types.ObjectId;
+  text: string;
+  timestamp: Date;
+}
+
 export interface ISwapRequest extends Document {
   senderId: mongoose.Types.ObjectId;
   receiverId: mongoose.Types.ObjectId;
   message: string;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: 'pending' | 'negotiating' | 'active' | 'completed' | 'rejected';
+  skillBeingSwapped: string;
+  milestones: IMilestone[];
+  resources: IResource[];
+  chatMessages: IChatMessage[];
+  learnerMarked: boolean;
+  mentorVerified: boolean;
+  jitsiRoomId: string;
+  scheduledAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
+
+const MilestoneSchema = new Schema<IMilestone>({
+  title: { type: String, required: true },
+  completed: { type: Boolean, default: false },
+});
+
+const ResourceSchema = new Schema<IResource>({
+  label: { type: String, required: true },
+  url: { type: String, required: true },
+});
+
+const ChatMessageSchema = new Schema<IChatMessage>({
+  senderId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  text: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now },
+});
 
 const SwapRequestSchema = new Schema<ISwapRequest>(
   {
@@ -29,10 +72,41 @@ const SwapRequestSchema = new Schema<ISwapRequest>(
     status: {
       type: String,
       enum: {
-        values: ['pending', 'accepted', 'rejected'],
+        values: ['pending', 'negotiating', 'active', 'completed', 'rejected'],
         message: '{VALUE} is not a valid status',
       },
       default: 'pending',
+    },
+    skillBeingSwapped: {
+      type: String,
+      default: '',
+    },
+    milestones: {
+      type: [MilestoneSchema],
+      default: [],
+    },
+    resources: {
+      type: [ResourceSchema],
+      default: [],
+    },
+    chatMessages: {
+      type: [ChatMessageSchema],
+      default: [],
+    },
+    learnerMarked: {
+      type: Boolean,
+      default: false,
+    },
+    mentorVerified: {
+      type: Boolean,
+      default: false,
+    },
+    jitsiRoomId: {
+      type: String,
+      default: '',
+    },
+    scheduledAt: {
+      type: Date,
     },
   },
   {

@@ -4,6 +4,7 @@ import dbConnect from "@/lib/dbConnect";
 import SwapRequest from "@/models/SwapRequest";
 import User from "@/models/User";
 import mongoose from "mongoose";
+import { sendSwapRequestEmail } from "@/lib/mail";
 
 /**
  * POST /api/swaps
@@ -73,16 +74,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check for existing pending request
+    // Check for existing active/pending request
     const existingRequest = await SwapRequest.findOne({
       senderId: sender._id,
       receiverId: receiverId,
-      status: "pending",
+      status: { $in: ["pending", "negotiating", "active"] },
     });
 
     if (existingRequest) {
       return NextResponse.json(
-        { error: "A pending request already exists for this user" },
+        { error: `A swap is already ${existingRequest.status} with this user` },
         { status: 409 }
       );
     }
@@ -97,6 +98,14 @@ export async function POST(req: NextRequest) {
 
     // Populate user data for response
     await swapRequest.populate("senderId receiverId");
+
+    // Send notification email to the receiver
+    const senderName = sender.name;
+    const receiverEmail = receiver.email;
+    const receiverName = receiver.name;
+    
+    // Non-blocking email send
+    sendSwapRequestEmail(receiverEmail, receiverName, senderName, message);
 
     return NextResponse.json(
       {

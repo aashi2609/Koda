@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { bio, skillsOffered, skillsDesired } = body;
+    const { bio, skillsOffered, skillsDesired, onboardingComplete } = body;
 
     // Validation
     if (!skillsOffered || !Array.isArray(skillsOffered) || skillsOffered.length === 0) {
@@ -45,14 +45,22 @@ export async function POST(req: NextRequest) {
 
     await dbConnect();
 
+    // Build update object
+    const updateData: Record<string, unknown> = {
+      bio: bio || "",
+      skillsOffered,
+      skillsDesired,
+    };
+
+    // Set onboardingComplete if provided
+    if (onboardingComplete) {
+      updateData.onboardingComplete = true;
+    }
+
     // Update user profile
     const updatedUser = await User.findOneAndUpdate(
       { email: session.user.email },
-      {
-        bio: bio || "",
-        skillsOffered,
-        skillsDesired,
-      },
+      updateData,
       { new: true }
     );
 
@@ -72,6 +80,8 @@ export async function POST(req: NextRequest) {
         bio: updatedUser.bio,
         skillsOffered: updatedUser.skillsOffered,
         skillsDesired: updatedUser.skillsDesired,
+        verifiedSkills: updatedUser.verifiedSkills,
+        onboardingComplete: updatedUser.onboardingComplete,
       },
     });
   } catch (error) {
@@ -118,6 +128,8 @@ export async function GET(req: NextRequest) {
         bio: user.bio,
         skillsOffered: user.skillsOffered,
         skillsDesired: user.skillsDesired,
+        verifiedSkills: user.verifiedSkills,
+        onboardingComplete: user.onboardingComplete,
       },
     });
   } catch (error) {

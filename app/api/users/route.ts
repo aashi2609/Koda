@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, isErrorResponse } from "@/lib/apiAuth";
 import dbConnect from "@/lib/dbConnect";
 import User from "@/models/User";
+import SwapRequest from "@/models/SwapRequest";
 
 export async function GET(req: NextRequest) {
   try {
@@ -49,8 +50,17 @@ export async function GET(req: NextRequest) {
 
     // Fetch users
     const users = await User.find(query).select(
-      "name email image bio skillsOffered skillsDesired createdAt"
+      "name email image bio skillsOffered skillsDesired averageRating reviewCount createdAt"
     );
+
+    // Get active swap requests sent by current user to any of these users
+    const activeRequests = await SwapRequest.find({
+      senderId: currentUser._id,
+      receiverId: { $in: users.map(u => u._id) },
+      status: { $in: ["pending", "negotiating", "active"] }
+    });
+
+    const activeReceiverIds = new Set(activeRequests.map(r => r.receiverId.toString()));
 
     return NextResponse.json({
       users: users.map((user) => ({
@@ -61,7 +71,10 @@ export async function GET(req: NextRequest) {
         bio: user.bio,
         skillsOffered: user.skillsOffered,
         skillsDesired: user.skillsDesired,
+        averageRating: user.averageRating || 0,
+        reviewCount: user.reviewCount || 0,
         createdAt: user.createdAt,
+        hasActiveRequest: activeReceiverIds.has(user._id.toString()),
       })),
     });
   } catch (error) {

@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import dbConnect from "@/lib/dbConnect";
 import User from "@/models/User";
-import { sendVerificationEmail } from "@/lib/email";
+import { sendVerificationEmail } from "@/lib/mail";
 
 export async function POST(req: NextRequest) {
   try {

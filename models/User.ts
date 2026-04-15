@@ -9,11 +9,15 @@ export interface IUser extends Document {
   bio?: string;
   skillsOffered: string[];
   skillsDesired: string[];
+  verifiedSkills: string[];
+  onboardingComplete: boolean;
   emailVerified?: Date | null;
   verificationToken?: string;
   verificationTokenExpiry?: Date;
   resetPasswordToken?: string;
   resetPasswordExpiry?: Date;
+  averageRating: number;
+  reviewCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,11 +32,15 @@ const UserSchema = new Schema<IUser>(
     bio: { type: String, maxlength: [500, "Bio cannot exceed 500 characters"], default: "" },
     skillsOffered: { type: [String], default: [] },
     skillsDesired: { type: [String], default: [] },
+    verifiedSkills: { type: [String], default: [] },
+    onboardingComplete: { type: Boolean, default: false },
     emailVerified: { type: Date, default: null },
     verificationToken: { type: String },
     verificationTokenExpiry: { type: Date },
     resetPasswordToken: { type: String },
     resetPasswordExpiry: { type: Date },
+    averageRating: { type: Number, default: 0 },
+    reviewCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

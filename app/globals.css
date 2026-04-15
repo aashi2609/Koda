@@ -5,6 +5,10 @@
   --foreground: #ededed;
   --neon-cyan: #00FFFF;
   --neon-pink: #FF00FF;
+  
+  /* Premium typography tokens */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui;
+  --font-heading: var(--font-outfit), var(--font-inter);
 }
 
 @theme inline {
@@ -13,24 +17,54 @@
   --color-cyber-bg: #030303;
   --color-neon-cyan: #00FFFF;
   --color-neon-pink: #FF00FF;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui;
+  --font-heading: var(--font-outfit), var(--font-sans);
 }
 
 body {
   background: #030303;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Subtle background noise for depth */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: var(--font-heading);
+}
+
+/* Glassmorphism Refinement */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Custom animations for cyber-noir theme */
 @keyframes pulse-glow {
-  0%, 100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
 .animate-pulse-glow {
@@ -40,38 +74,33 @@ body {
 /* Neon glow effects */
 .neon-glow-cyan {
   box-shadow: 0 0 10px rgba(0, 255, 255, 0.5),
-              0 0 20px rgba(0, 255, 255, 0.3),
-              0 0 30px rgba(0, 255, 255, 0.1);
+              0 0 20px rgba(0, 255, 255, 0.3);
 }
 
 .neon-glow-pink {
   box-shadow: 0 0 10px rgba(255, 0, 255, 0.5),
-              0 0 20px rgba(255, 0, 255, 0.3),
-              0 0 30px rgba(255, 0, 255, 0.1);
+              0 0 20px rgba(255, 0, 255, 0.3);
 }
 
 /* Neon pulse on hover for buttons */
 @keyframes neon-pulse-cyan {
-  0%, 100% { box-shadow: 0 0 5px rgba(0,255,255,0.4), 0 0 10px rgba(0,255,255,0.2); }
-  50%       { box-shadow: 0 0 15px rgba(0,255,255,0.8), 0 0 30px rgba(0,255,255,0.4); }
+  0%, 100% { box-shadow: 0 0 8px rgba(0,255,255,0.4), 0 0 16px rgba(0,255,255,0.2); }
+  50%       { box-shadow: 0 0 20px rgba(0,255,255,0.8), 0 0 40px rgba(0,255,255,0.4); }
 }
 @keyframes neon-pulse-pink {
-  0%, 100% { box-shadow: 0 0 5px rgba(255,0,255,0.4), 0 0 10px rgba(255,0,255,0.2); }
-  50%       { box-shadow: 0 0 15px rgba(255,0,255,0.8), 0 0 30px rgba(255,0,255,0.4); }
+  0%, 100% { box-shadow: 0 0 8px rgba(255,0,255,0.4), 0 0 16px rgba(255,0,255,0.2); }
+  50%       { box-shadow: 0 0 20px rgba(255,0,255,0.8), 0 0 40px rgba(255,0,255,0.4); }
 }
 
 .btn-neon-cyan:hover  { animation: neon-pulse-cyan 1.5s ease-in-out infinite; }
 .btn-neon-pink:hover  { animation: neon-pulse-pink 1.5s ease-in-out infinite; }
 
-/* Smooth page transitions */
-.page-enter { opacity: 0; transform: translateY(12px); }
-.page-enter-active { opacity: 1; transform: translateY(0); transition: opacity 0.4s ease, transform 0.4s ease; }
-
 /* Scrollbar styling */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #020202; }
-::-webkit-scrollbar-thumb { background: rgba(0,255,255,0.3); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0,255,255,0.6); }
+::-webkit-scrollbar-thumb { background: rgba(0,255,255,0.2); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,255,255,0.4); }
 
-/* Touch targets — min 44px for mobile */
-button, a { min-height: 44px; }
+.backdrop-blur-md {
+  position: relative;
+}
