@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { getBaseUrl } from "./utils";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -12,7 +13,7 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function sendVerificationEmail(email: string, token: string, name: string) {
-  const verifyUrl = `${process.env.NEXTAUTH_URL}/api/auth/verify-email?token=${token}`;
+  const verifyUrl = `${getBaseUrl()}/api/auth/verify-email?token=${token}`;
 
   await transporter.sendMail({
     from: `"Koda" <${process.env.EMAIL_FROM}>`,
@@ -33,7 +34,7 @@ export async function sendVerificationEmail(email: string, token: string, name: 
 }
 
 export async function sendPasswordResetEmail(email: string, token: string, name: string) {
-  const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`;
+  const resetUrl = `${getBaseUrl()}/reset-password?token=${token}`;
 
   await transporter.sendMail({
     from: `"Koda" <${process.env.EMAIL_FROM}>`,

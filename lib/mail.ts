@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer';
+import { getBaseUrl } from './utils';
+
 
 const transporter = nodemailer.createTransport({
   service: process.env.EMAIL_SERVICE || 'gmail',
@@ -25,7 +27,7 @@ export const sendSwapRequestEmail = async (to: string, receiverName: string, sen
             <p style="font-style: italic; margin: 0;">"${message}"</p>
           </div>
           <p>Log in to your dashboard to respond to this request.</p>
-          <a href="${process.env.NEXTAUTH_URL}/dashboard" style="display: inline-block; background: #00FFFF; color: #000; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 20px;">View Dashboard</a>
+          <a href="${getBaseUrl()}/dashboard" style="display: inline-block; background: #00FFFF; color: #000; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 20px;">View Dashboard</a>
           <hr style="border: none; border-top: 1px solid #eee; margin-top: 30px;" />
           <p style="font-size: 12px; color: #999;">You received this because someone initiated a swap with you on Koda.</p>
         </div>
@@ -48,7 +50,7 @@ export const sendSwapAcceptedEmail = async (to: string, senderName: string, rece
           <p>Hi <strong>${senderName}</strong>,</p>
           <p>Great news! <strong>${receiverName}</strong> has accepted your swap request.</p>
           <p>You can now start negotiating the details and schedule your first session in the Session Hub.</p>
-          <a href="${process.env.NEXTAUTH_URL}/dashboard" style="display: inline-block; background: #00FFFF; color: #000; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 20px;">Go to Session Hub</a>
+          <a href="${getBaseUrl()}/dashboard" style="display: inline-block; background: #00FFFF; color: #000; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 20px;">Go to Session Hub</a>
         </div>
       `,
     });
@@ -74,7 +76,7 @@ export const sendSwapCompletionEmail = async (to: string, userName: string, part
               🏆 Verified Completion
             </div>
           </div>
-          <a href="${process.env.NEXTAUTH_URL}/settings" style="display: inline-block; background: #FF00FF; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 20px;">View My Profile</a>
+          <a href="${getBaseUrl()}/settings" style="display: inline-block; background: #FF00FF; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 20px;">View My Profile</a>
         </div>
       `,
     });
@@ -84,7 +86,7 @@ export const sendSwapCompletionEmail = async (to: string, userName: string, part
 };
 
 export const sendVerificationEmail = async (email: string, token: string, name: string) => {
-  const verifyUrl = `${process.env.NEXTAUTH_URL}/api/auth/verify-email?token=${token}`;
+  const verifyUrl = `${getBaseUrl()}/api/auth/verify-email?token=${token}`;
   try {
     await transporter.sendMail({
       from: `"Koda" <${fromEmail}>`,
@@ -108,7 +110,7 @@ export const sendVerificationEmail = async (email: string, token: string, name: 
 };
 
 export const sendPasswordResetEmail = async (email: string, token: string, name: string) => {
-  const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`;
+  const resetUrl = `${getBaseUrl()}/reset-password?token=${token}`;
   try {
     await transporter.sendMail({
       from: `"Koda" <${fromEmail}>`,
