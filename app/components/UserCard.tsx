@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { FiUser, FiStar } from "react-icons/fi";
+import Image from "next/image";
 
 interface UserCardProps {
   user: {
@@ -32,10 +33,12 @@ export default function UserCard({ user, onRequestSwap }: UserCardProps) {
       {/* User Header */}
       <div className="flex items-center gap-4 mb-4 relative z-10">
         {user.image ? (
-          <img
+          <Image
             src={user.image}
             alt={user.name}
-            className="w-16 h-16 rounded-full border-2 border-neon-cyan/50"
+            width={64}
+            height={64}
+            className="w-16 h-16 rounded-full border-2 border-neon-cyan/50 object-cover"
           />
         ) : (
           <div className="w-16 h-16 rounded-full border-2 border-neon-cyan/50 flex items-center justify-center bg-neon-cyan/10">

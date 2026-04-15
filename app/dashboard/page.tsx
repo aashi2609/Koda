@@ -28,7 +28,7 @@ interface SwapRequest {
 }
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
   const [incoming, setIncoming] = useState<SwapRequest[]>([]);
   const [outgoing, setOutgoing] = useState<SwapRequest[]>([]);

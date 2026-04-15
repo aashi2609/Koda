@@ -38,7 +38,7 @@ export async function POST(
     await swap.save();
 
     return NextResponse.json({ resources: swap.resources });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }
@@ -75,7 +75,7 @@ export async function DELETE(
     await swap.save();
 
     return NextResponse.json({ resources: swap.resources });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

@@ -28,7 +28,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!isParticipant) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
 
     return NextResponse.json({ messages: swap.chatMessages });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       timestamp: new Date()
     };
 
-    swap.chatMessages.push(message as any);
+    swap.chatMessages.push(message as never);
     await swap.save();
 
     const populatedSwap = await SwapRequest.findById(id).populate("chatMessages.senderId", "name image");
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     return NextResponse.json({ message: lastMessage });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

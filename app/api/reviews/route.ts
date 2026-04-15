@@ -4,7 +4,6 @@ import dbConnect from "@/lib/dbConnect";
 import Review from "@/models/Review";
 import User from "@/models/User";
 import SwapRequest from "@/models/SwapRequest";
-import mongoose from "mongoose";
 
 export async function POST(req: NextRequest) {
   const authResult = await requireAuth(req);
@@ -53,7 +52,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Review submitted successfully", review });
   } catch (error) {
     console.error("Review submission error:", error);
-    if ((error as any).code === 11000) {
+    interface MongoError extends Error {
+      code?: number;
+    }
+    if ((error as MongoError).code === 11000) {
       return NextResponse.json({ error: "You have already reviewed this swap" }, { status: 400 });
     }
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaGithub, FaGoogle } from "react-icons/fa";
@@ -12,7 +11,6 @@ import dynamic from "next/dynamic";
 const Aurora = dynamic(() => import("../components/Aurora"), { ssr: false });
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [form, setForm] = useState({ name: "", username: "", email: "", password: "", confirm: "" });
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);

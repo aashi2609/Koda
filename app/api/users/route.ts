@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     const skillFilter = searchParams.get("skill");
 
     // Build query to exclude current user
-    const query: any = {
+    const query: Record<string, unknown> = {
       _id: { $ne: currentUser._id },
     };
 

@@ -7,9 +7,11 @@ import { FiLock, FiEye, FiEyeOff, FiCheck } from "react-icons/fi";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
+import { Suspense } from "react";
+
 const Aurora = dynamic(() => import("../components/Aurora"), { ssr: false });
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const params = useSearchParams();
   const router = useRouter();
   const token = params.get("token") || "";
@@ -96,5 +98,17 @@ export default function ResetPasswordPage() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#030303] flex items-center justify-center">
+        <div className="text-[#FF00FF] animate-pulse">Syncing Cryptography...</div>
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

@@ -105,8 +105,8 @@ export default function SwapChat({ swapId, currentUserId }: SwapChatProps) {
     }
   };
 
-  const getSenderIdStr = (senderId: any) => {
-    if (typeof senderId === 'string') return senderId;
+  const getSenderIdStr = (senderId: Message["senderId"]) => {
+    if (typeof senderId === "string") return senderId;
     return senderId?._id || senderId;
   };
 

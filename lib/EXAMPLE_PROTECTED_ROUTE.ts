@@ -91,13 +91,8 @@ export async function POST(req: NextRequest) {
  */
 export async function PATCH(req: NextRequest) {
   try {
-    const authResult = await requireAuth(req);
-    if (isErrorResponse(authResult)) {
-      return authResult;
-    }
-
-    const { session } = authResult;
-    const body = await req.json();
+    await requireAuth(req);
+    await req.json();
 
     // Your update logic here
 
@@ -122,8 +117,6 @@ export async function DELETE(req: NextRequest) {
     if (isErrorResponse(authResult)) {
       return authResult;
     }
-
-    const { session } = authResult;
 
     // Your delete logic here
     // Make sure to verify the user has permission to delete the resource

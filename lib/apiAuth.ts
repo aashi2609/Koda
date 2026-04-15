@@ -8,7 +8,8 @@ import { Session } from "next-auth";
  * Returns the session if authenticated, or a 401 response if not
  */
 export async function requireAuth(
-  req: NextRequest
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _req: NextRequest
 ): Promise<{ session: Session } | NextResponse> {
   const session = await getServerSession(authOptions);
 

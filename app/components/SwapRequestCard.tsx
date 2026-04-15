@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { FiCheck, FiX, FiUser, FiClock, FiMessageSquare, FiPlay, FiExternalLink } from "react-icons/fi";
 import Link from "next/link";
+import Image from "next/image";
 
 interface SwapUser {
   _id: string;
@@ -23,18 +24,18 @@ interface SwapRequest {
 interface SwapRequestCardProps {
   request: SwapRequest;
   type: "incoming" | "outgoing";
-  onUpdateStatus: (id: string, status: any) => void;
+  onUpdateStatus: (id: string, status: SwapRequest["status"]) => void;
 }
 
-function StatusBadge({ status }: { status: any }) {
-  const styles: any = {
+function StatusBadge({ status }: { status: SwapRequest["status"] }) {
+  const styles: Record<SwapRequest["status"], string> = {
     pending: "bg-yellow-500/10 border-yellow-500/40 text-yellow-500",
     negotiating: "bg-orange-500/10 border-orange-500/40 text-orange-500",
     active: "bg-neon-cyan/10 border-neon-cyan/40 text-neon-cyan",
     completed: "bg-green-500/10 border-green-500/40 text-green-500",
     rejected: "bg-neon-pink/10 border-neon-pink/40 text-neon-pink",
   };
-  const icons: any = {
+  const icons: Record<SwapRequest["status"], React.ReactNode> = {
     pending: <FiClock className="text-xs" />,
     negotiating: <FiMessageSquare className="text-xs" />,
     active: <FiPlay className="text-xs" />,
@@ -66,10 +67,12 @@ export default function SwapRequestCard({ request, type, onUpdateStatus }: SwapR
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           {otherUser?.image ? (
-            <img
+            <Image
               src={otherUser.image}
               alt={otherUser.name}
-              className="w-10 h-10 rounded-full border-2 border-neon-cyan/30"
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-full border-2 border-neon-cyan/30 object-cover"
             />
           ) : (
             <div className="w-10 h-10 rounded-full border-2 border-neon-cyan/30 bg-neon-cyan/10 flex items-center justify-center">
@@ -86,7 +89,7 @@ export default function SwapRequestCard({ request, type, onUpdateStatus }: SwapR
 
       {/* Message */}
       <p className="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-2 italic">
-        "{request.message}"
+        &quot;{request.message}&quot;
       </p>
 
       {/* Date */}

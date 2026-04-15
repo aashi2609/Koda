@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiUpload, FiUser, FiSave } from "react-icons/fi";
 import dynamic from "next/dynamic";
@@ -162,7 +163,7 @@ export default function SettingsPage() {
                   onClick={() => fileRef.current?.click()}
                 >
                   {avatarPreview ? (
-                    <img src={avatarPreview} alt="avatar" className="w-full h-full object-cover" />
+                    <Image src={avatarPreview} alt="avatar" width={80} height={80} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-[#00FFFF]/10 flex items-center justify-center">
                       <FiUser className="text-[#00FFFF] text-2xl" />

@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 import { FiSearch, FiX } from "react-icons/fi";
 import Navigation from "../components/Navigation";
 import UserCard from "../components/UserCard";
-import { UserCardSkeleton } from "../components/Skeleton";
 import SwapRequestModal from "../components/SwapRequestModal";
 import dynamic from "next/dynamic";
 
@@ -28,7 +27,7 @@ interface User {
 
 export default function DiscoverPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [skillFilter, setSkillFilter] = useState("");

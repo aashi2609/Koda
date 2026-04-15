@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { FiStar, FiMessageSquare, FiSend, FiX } from "react-icons/fi";
 
 interface ReviewModalProps {

@@ -5,7 +5,6 @@ import { getPusherServer } from "@/lib/pusher";
 export async function POST(req: NextRequest) {
   const authResult = await requireAuth(req);
   if (isErrorResponse(authResult)) return authResult;
-  const { session } = authResult;
 
   try {
     const body = await req.text();

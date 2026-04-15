@@ -17,12 +17,43 @@ import dynamic from "next/dynamic";
 
 const Aurora = dynamic(() => import("../../components/Aurora"), { ssr: false });
 
+interface Milestone {
+  _id?: string;
+  title: string;
+  completed: boolean;
+}
+
+interface Resource {
+  _id?: string;
+  label: string;
+  url: string;
+}
+
+interface SwapUser {
+  _id: string;
+  name: string;
+  image?: string;
+}
+
+interface SwapData {
+  _id: string;
+  senderId: SwapUser;
+  receiverId: SwapUser;
+  status: "pending" | "negotiating" | "active" | "completed" | "rejected";
+  jitsiRoomId?: string;
+  learnerMarked?: boolean;
+  mentorVerified?: boolean;
+  scheduledAt?: string | Date;
+  milestones: Milestone[];
+  resources: Resource[];
+}
+
 export default function SwapHubPage() {
   const { id } = useParams() as { id: string };
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
 
-  const [swap, setSwap] = useState<any>(null);
+  const [swap, setSwap] = useState<SwapData | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -60,7 +91,14 @@ export default function SwapHubPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setSwap((prev: any) => ({ ...prev, status: data.swapRequest.status, jitsiRoomId: data.swapRequest.jitsiRoomId }));
+        setSwap((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            status: data.swapRequest.status,
+            jitsiRoomId: data.swapRequest.jitsiRoomId
+          };
+        });
       }
     } finally {
       setActionLoading(false);

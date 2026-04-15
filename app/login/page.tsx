@@ -9,9 +9,11 @@ import { FiLock, FiEye, FiEyeOff, FiAtSign, FiCheck } from "react-icons/fi";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
+import { Suspense } from "react";
+
 const Aurora = dynamic(() => import("../components/Aurora"), { ssr: false });
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const params = useSearchParams();
   const [login, setLogin] = useState("");
@@ -167,5 +169,17 @@ export default function LoginPage() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#030303] flex items-center justify-center">
+        <div className="text-[#00FFFF] animate-pulse">Initializing Security...</div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }

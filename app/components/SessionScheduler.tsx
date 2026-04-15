@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiCalendar, FiClock, FiPlus, FiExternalLink, FiCheck } from "react-icons/fi";
+import { FiCalendar, FiClock, FiPlus, FiExternalLink } from "react-icons/fi";
 import { format } from "date-fns";
 
 interface SessionSchedulerProps {

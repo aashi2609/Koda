@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { FiLink, FiPlus, FiTrash2, FiExternalLink, FiX, FiFile } from "react-icons/fi";
+import { FiLink, FiPlus, FiTrash2, FiExternalLink, FiX } from "react-icons/fi";
 import { useState } from "react";
 import { UploadButton } from "@/utils/uploadthing";
 

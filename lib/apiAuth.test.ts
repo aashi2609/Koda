@@ -20,7 +20,7 @@ describe("requireAuth middleware", () => {
   });
 
   it("returns 401 when session has no user", async () => {
-    vi.mocked(getServerSession).mockResolvedValue({ expires: "2099-01-01" } as any);
+    vi.mocked(getServerSession).mockResolvedValue({ expires: "2099-01-01" } as { expires: string; user: undefined });
     const req = new NextRequest("http://localhost/api/test");
     const result = await requireAuth(req);
     expect(isErrorResponse(result)).toBe(true);
@@ -31,7 +31,7 @@ describe("requireAuth middleware", () => {
       user: { id: "u1", email: "a@b.com", name: "Test" },
       expires: "2099-01-01",
     };
-    vi.mocked(getServerSession).mockResolvedValue(mockSession as any);
+    vi.mocked(getServerSession).mockResolvedValue(mockSession as { expires: string; user: { id: string; email: string; name: string } });
     const req = new NextRequest("http://localhost/api/test");
     const result = await requireAuth(req);
     expect(isErrorResponse(result)).toBe(false);
