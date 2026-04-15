@@ -25,9 +25,9 @@ export interface ISwapRequest extends Document {
   message: string;
   status: 'pending' | 'negotiating' | 'active' | 'completed' | 'rejected';
   skillBeingSwapped: string;
-  milestones: IMilestone[];
-  resources: IResource[];
-  chatMessages: IChatMessage[];
+  milestones: mongoose.Types.DocumentArray<IMilestone>;
+  resources: mongoose.Types.DocumentArray<IResource>;
+  chatMessages: mongoose.Types.DocumentArray<IChatMessage>;
   learnerMarked: boolean;
   mentorVerified: boolean;
   jitsiRoomId: string;
