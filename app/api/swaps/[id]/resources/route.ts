@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, isErrorResponse } from "@/lib/apiAuth";
 import dbConnect from "@/lib/dbConnect";
-import SwapRequest from "@/models/SwapRequest";
+import SwapRequest, { ISwapRequest } from "@/models/SwapRequest";
+import { HydratedDocument } from "mongoose";
 import User from "@/models/User";
 
 export async function POST(
@@ -21,7 +22,7 @@ export async function POST(
       return NextResponse.json({ error: "Label and URL required" }, { status: 400 });
     }
 
-    const swap = await SwapRequest.findById(id);
+    const swap = (await SwapRequest.findById(id)) as HydratedDocument<ISwapRequest> | null;
     if (!swap) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const currentUser = await User.findOne({ email: session.user.email });

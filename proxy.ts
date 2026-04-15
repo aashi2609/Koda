@@ -14,7 +14,7 @@ const publicPaths = [
 // Routes that should be accessible without a complete profile
 const noProfilePaths = ["/onboarding", "/api", "/_next", "/favicon.ico"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow static files and API routes
